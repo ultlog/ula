@@ -2,7 +2,6 @@ package com.ultlog.ula;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 
 /**
@@ -13,7 +12,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
  **/
 
 @SpringBootApplication
-@EntityScan(basePackageClasses = { UlaApplication.class})
 public class UlaApplication {
 
     public static void main(String[] args) {

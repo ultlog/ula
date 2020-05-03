@@ -1,9 +1,10 @@
 package com.ultlog.ula.exception;
 
 /**
- * @program: collector
- * @link:
- * @create: 2020-05-02
+ * @program: ula
+ * @link: github.com/ultlog/ula
+ * @author: will
+ * @create: 2020-05-03
  **/
 public class NoEsAddressException extends RuntimeException {
 

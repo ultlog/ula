@@ -1,15 +1,10 @@
 package com.ultlog.ula.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
- * @program: collector
- * @link: github.com/ultlog/collector
+ * @program: ula
+ * @link: github.com/ultlog/ula
  * @author: will
  * @create: 2020-05-01
  **/
@@ -43,8 +38,7 @@ public class Log implements Serializable {
     /**
      * create time
      */
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private LocalDateTime createTime;
+    private Long createTime;
 
     /**
      * log message
@@ -59,7 +53,7 @@ public class Log implements Serializable {
     /**
      * accept time
      */
-    private LocalDateTime acceptTime;
+    private Long acceptTime;
 
     /**
      * uri which throws this exception
@@ -102,11 +96,11 @@ public class Log implements Serializable {
         return this;
     }
 
-    public LocalDateTime getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public Log setCreateTime(LocalDateTime createTime) {
+    public Log setCreateTime(Long createTime) {
         this.createTime = createTime;
         return this;
     }
@@ -138,11 +132,11 @@ public class Log implements Serializable {
         return this;
     }
 
-    public LocalDateTime getAcceptTime() {
+    public Long getAcceptTime() {
         return acceptTime;
     }
 
-    public Log setAcceptTime(LocalDateTime acceptTime) {
+    public Log setAcceptTime(Long acceptTime) {
         this.acceptTime = acceptTime;
         return this;
     }

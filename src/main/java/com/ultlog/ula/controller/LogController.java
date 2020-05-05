@@ -3,13 +3,12 @@ package com.ultlog.ula.controller;
 import com.ultlog.ula.model.Log;
 import com.ultlog.ula.model.Page;
 import com.ultlog.ula.model.Query;
+import com.ultlog.ula.model.Result;
 import com.ultlog.ula.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -19,7 +18,8 @@ import java.util.Objects;
  * @author: will
  * @create: 2020-05-02
  **/
-@RestController("/api/v1")
+@RestController()
+@RequestMapping("/api/v1")
 public class LogController {
 
     @Autowired
@@ -33,7 +33,7 @@ public class LogController {
 
 
     @GetMapping(value = "/log", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<Log> getLog(Query query) {
+    public Result<Page<Log>> getLog(Query query) {
         // check param all legal
         if (Objects.isNull(query.getSize())) {
             query.setSize(20);
@@ -41,7 +41,7 @@ public class LogController {
         if (Objects.isNull(query.getOffset())) {
             query.setOffset(0);
         }
-        return esService.getLog(query);
+        return new Result<>(HttpStatus.OK.value(),null,esService.getLog(query));
 
     }
 }

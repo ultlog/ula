@@ -19,7 +19,7 @@ import java.util.Objects;
  * @author: will
  * @create: 2020-05-02
  **/
-@RestController
+@RestController("/api/v1")
 public class LogController {
 
     @Autowired

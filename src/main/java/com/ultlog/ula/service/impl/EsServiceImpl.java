@@ -81,6 +81,8 @@ public class EsServiceImpl implements EsService {
         final String project = query.getProject();
         final String module = query.getModule();
         final String message = query.getMessage();
+        final String uuid = query.getUuid();
+        final String level = query.getLevel();
         final Long gt = query.getGt();
         final Long lt = query.getLt();
         final int offset = query.getOffset();
@@ -89,14 +91,14 @@ public class EsServiceImpl implements EsService {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         // default select 0 ~ now
-        if (ObjectUtil.AllObjectNull(project, module, message, gt, lt)) {
+        if (ObjectUtil.AllObjectNull(project, module, uuid, level, message, gt, lt)) {
 
             final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
             createTime.gt(0);
             createTime.lt(System.currentTimeMillis());
             sourceBuilder.query(createTime);
 
-        } else if (ObjectUtil.AllObjectNull(project, module, message) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
+        } else if (ObjectUtil.AllObjectNull(project, uuid, level,module, message) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
             final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
             createTime.lt(lt);
             createTime.gt(gt);
@@ -116,6 +118,18 @@ public class EsServiceImpl implements EsService {
 
             if (!StringUtils.isEmpty(message)) {
                 MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("message", message).operator(Operator.AND);
+                matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+                boolQueryBuilder.must(matchQueryBuilder);
+            }
+
+            if (!StringUtils.isEmpty(uuid)) {
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("uuid", uuid).operator(Operator.AND);
+                matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+                boolQueryBuilder.must(matchQueryBuilder);
+            }
+
+            if (!StringUtils.isEmpty(level)) {
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("level", level).operator(Operator.AND);
                 matchQueryBuilder.fuzziness(Fuzziness.AUTO);
                 boolQueryBuilder.must(matchQueryBuilder);
             }

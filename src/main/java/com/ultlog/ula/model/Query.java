@@ -14,6 +14,10 @@ public class Query {
 
     private String message;
 
+    private String uuid;
+
+    private String level;
+
     private Long gt;
 
     private Long lt;
@@ -46,6 +50,24 @@ public class Query {
 
     public Query setMessage(String message) {
         this.message = message;
+        return this;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public Query setUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public Query setLevel(String level) {
+        this.level = level;
         return this;
     }
 

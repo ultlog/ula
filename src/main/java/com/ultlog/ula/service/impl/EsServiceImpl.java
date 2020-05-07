@@ -98,7 +98,7 @@ public class EsServiceImpl implements EsService {
             createTime.lt(System.currentTimeMillis());
             sourceBuilder.query(createTime);
 
-        } else if (ObjectUtil.AllObjectNull(project, uuid, level,module, message) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
+        } else if (ObjectUtil.AllObjectNull(project, uuid, level, module, message) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
             final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
             createTime.lt(lt);
             createTime.gt(gt);
@@ -132,6 +132,12 @@ public class EsServiceImpl implements EsService {
                 MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("level", level).operator(Operator.AND);
                 matchQueryBuilder.fuzziness(Fuzziness.AUTO);
                 boolQueryBuilder.must(matchQueryBuilder);
+            }
+            if (lt != null && gt != null) {
+                final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
+                createTime.lt(lt);
+                createTime.gt(gt);
+                boolQueryBuilder.must(createTime);
             }
             sourceBuilder.query(boolQueryBuilder);
         }

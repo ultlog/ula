@@ -18,6 +18,8 @@ public class Query {
 
     private String level;
 
+    private String stack;
+
     private Long gt;
 
     private Long lt;
@@ -68,6 +70,15 @@ public class Query {
 
     public Query setLevel(String level) {
         this.level = level;
+        return this;
+    }
+
+    public String getStack() {
+        return stack;
+    }
+
+    public Query setStack(String stack) {
+        this.stack = stack;
         return this;
     }
 

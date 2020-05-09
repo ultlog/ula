@@ -115,7 +115,8 @@ public class EsServiceImpl implements EsService {
             }
 
             if (!StringUtils.isEmpty(message)) {
-                WildcardQueryBuilder matchQueryBuilder = new WildcardQueryBuilder("message", "*" + message + "*");
+//                WildcardQueryBuilder matchQueryBuilder = new WildcardQueryBuilder("message", "*" + message + "*");
+                final MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("message", message).operator(Operator.AND);
                 boolQueryBuilder.must(matchQueryBuilder);
             }
 
@@ -131,7 +132,8 @@ public class EsServiceImpl implements EsService {
                 boolQueryBuilder.must(matchQueryBuilder);
             }
             if (!StringUtils.isEmpty(stack)) {
-                WildcardQueryBuilder matchQueryBuilder = new WildcardQueryBuilder("stack", "*" + stack + "*");
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("stack", stack).operator(Operator.AND);
+                matchQueryBuilder.fuzziness(Fuzziness.AUTO);
                 boolQueryBuilder.must(matchQueryBuilder);
             }
             if (lt != null && gt != null) {

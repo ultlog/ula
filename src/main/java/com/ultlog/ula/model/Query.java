@@ -14,6 +14,12 @@ public class Query {
 
     private String message;
 
+    private String uuid;
+
+    private String level;
+
+    private String stack;
+
     private Long gt;
 
     private Long lt;
@@ -46,6 +52,33 @@ public class Query {
 
     public Query setMessage(String message) {
         this.message = message;
+        return this;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public Query setUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public Query setLevel(String level) {
+        this.level = level;
+        return this;
+    }
+
+    public String getStack() {
+        return stack;
+    }
+
+    public Query setStack(String stack) {
+        this.stack = stack;
         return this;
     }
 

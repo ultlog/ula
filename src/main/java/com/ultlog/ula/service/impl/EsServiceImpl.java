@@ -15,15 +15,14 @@ import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -50,6 +49,7 @@ public class EsServiceImpl implements EsService {
     private final String indexName = "ult_index";
     final String createTimeFieldName = "createTime";
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(EsServiceImpl.class);
 
     @Override
     public void insertLog(Log log) {
@@ -65,8 +65,7 @@ public class EsServiceImpl implements EsService {
             request.source(s, XContentType.JSON);
             client.index(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            // todo
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
         }
     }
 
@@ -81,6 +80,9 @@ public class EsServiceImpl implements EsService {
         final String project = query.getProject();
         final String module = query.getModule();
         final String message = query.getMessage();
+        final String uuid = query.getUuid();
+        final String level = query.getLevel();
+        final String stack = query.getStack();
         final Long gt = query.getGt();
         final Long lt = query.getLt();
         final int offset = query.getOffset();
@@ -89,14 +91,14 @@ public class EsServiceImpl implements EsService {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         // default select 0 ~ now
-        if (ObjectUtil.AllObjectNull(project, module, message, gt, lt)) {
+        if (ObjectUtil.AllObjectNull(project, module, uuid, level, message, stack, gt, lt)) {
 
             final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
             createTime.gt(0);
             createTime.lt(System.currentTimeMillis());
             sourceBuilder.query(createTime);
 
-        } else if (ObjectUtil.AllObjectNull(project, module, message) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
+        } else if (ObjectUtil.AllObjectNull(project, uuid, level, module, message, stack) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
             final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
             createTime.lt(lt);
             createTime.gt(gt);
@@ -115,9 +117,32 @@ public class EsServiceImpl implements EsService {
             }
 
             if (!StringUtils.isEmpty(message)) {
-                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("message", message).operator(Operator.AND);
+//                WildcardQueryBuilder matchQueryBuilder = new WildcardQueryBuilder("message", "*" + message + "*");
+                final MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("message", message).operator(Operator.AND);
+                boolQueryBuilder.must(matchQueryBuilder);
+            }
+
+            if (!StringUtils.isEmpty(uuid)) {
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("uuid", uuid).operator(Operator.AND);
                 matchQueryBuilder.fuzziness(Fuzziness.AUTO);
                 boolQueryBuilder.must(matchQueryBuilder);
+            }
+
+            if (!StringUtils.isEmpty(level)) {
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("level", level).operator(Operator.AND);
+                matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+                boolQueryBuilder.must(matchQueryBuilder);
+            }
+            if (!StringUtils.isEmpty(stack)) {
+                MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("stack", stack).operator(Operator.AND);
+                matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+                boolQueryBuilder.must(matchQueryBuilder);
+            }
+            if (lt != null && gt != null) {
+                final RangeQueryBuilder createTime = new RangeQueryBuilder(createTimeFieldName);
+                createTime.lt(lt);
+                createTime.gt(gt);
+                boolQueryBuilder.must(createTime);
             }
             sourceBuilder.query(boolQueryBuilder);
         }
@@ -131,8 +156,7 @@ public class EsServiceImpl implements EsService {
             final CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
             count = Long.valueOf(countResponse.getCount()).intValue();
         } catch (IOException e) {
-            // todo handle exception
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
             return null;
         }
 
@@ -155,8 +179,7 @@ public class EsServiceImpl implements EsService {
                 logs.add(log);
             }
         } catch (IOException e) {
-            // todo handle exception
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
             return null;
         }
 

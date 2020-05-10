@@ -48,7 +48,7 @@ public class Log implements Serializable {
     /**
      * error
      */
-    private Exception exception;
+    private String stack;
 
     /**
      * accept time
@@ -114,12 +114,12 @@ public class Log implements Serializable {
         return this;
     }
 
-    public Exception getException() {
-        return exception;
+    public String getStack() {
+        return stack;
     }
 
-    public Log setException(Exception exception) {
-        this.exception = exception;
+    public Log setStack(String stack) {
+        this.stack = stack;
         return this;
     }
 

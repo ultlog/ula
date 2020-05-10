@@ -20,7 +20,7 @@ public class ObjectUtil {
 
         for (Object object : objects) {
             // todo change #isEmpty to @isBotBlank
-            if (object != null && (object instanceof String && !StringUtils.isEmpty(object))) {
+            if (object != null && (!(object instanceof String) || !StringUtils.isEmpty(object))) {
                 return false;
             }
         }

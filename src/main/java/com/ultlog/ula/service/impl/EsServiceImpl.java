@@ -21,6 +21,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -47,6 +49,7 @@ public class EsServiceImpl implements EsService {
     private final String indexName = "ult_index";
     final String createTimeFieldName = "createTime";
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(EsServiceImpl.class);
 
     @Override
     public void insertLog(Log log) {
@@ -62,8 +65,7 @@ public class EsServiceImpl implements EsService {
             request.source(s, XContentType.JSON);
             client.index(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            // todo
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
         }
     }
 
@@ -154,8 +156,7 @@ public class EsServiceImpl implements EsService {
             final CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
             count = Long.valueOf(countResponse.getCount()).intValue();
         } catch (IOException e) {
-            // todo handle exception
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
             return null;
         }
 
@@ -178,8 +179,7 @@ public class EsServiceImpl implements EsService {
                 logs.add(log);
             }
         } catch (IOException e) {
-            // todo handle exception
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(),e);
             return null;
         }
 

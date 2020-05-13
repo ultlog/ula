@@ -1,9 +1,9 @@
 package com.ultlog.ula.controller;
 
-import com.ultlog.ula.model.Log;
-import com.ultlog.ula.model.Page;
-import com.ultlog.ula.model.Query;
-import com.ultlog.ula.model.Result;
+import com.ultlog.common.model.Log;
+import com.ultlog.common.model.Page;
+import com.ultlog.common.model.Query;
+import com.ultlog.common.model.Result;
 import com.ultlog.ula.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

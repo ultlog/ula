@@ -1,9 +1,9 @@
 package com.ultlog.ula.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ultlog.ula.model.Log;
-import com.ultlog.ula.model.Page;
-import com.ultlog.ula.model.Query;
+import com.ultlog.common.model.Log;
+import com.ultlog.common.model.Page;
+import com.ultlog.common.model.Query;
 import com.ultlog.ula.service.EsService;
 import com.ultlog.ula.util.ObjectUtil;
 import org.elasticsearch.action.index.IndexRequest;

@@ -1,8 +1,8 @@
 package com.ultlog.ula.service;
 
-import com.ultlog.ula.model.Log;
-import com.ultlog.ula.model.Page;
-import com.ultlog.ula.model.Query;
+import com.ultlog.common.model.Log;
+import com.ultlog.common.model.Page;
+import com.ultlog.common.model.Query;
 
 /**
  * @program: ula

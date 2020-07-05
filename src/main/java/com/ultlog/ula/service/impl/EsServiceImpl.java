@@ -24,13 +24,13 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.ultlog.common.constant.ESConstant.*;
 
@@ -185,31 +185,149 @@ public class EsServiceImpl implements EsService {
 
     @Override
     public void insertProject(String project) {
-
+        IndexRequest request = new IndexRequest(PROJECT_INDEX_NAME);
+        Map<String, String> projectMap = new HashMap<>();
+        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex(project.getBytes()));
+        projectMap.put(FIELD_PROJECT, project);
+        request.source(projectMap);
+        try {
+            client.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public void insertModule(String project, String module) {
-
+        IndexRequest request = new IndexRequest(MODULE_INDEX_NAME);
+        Map<String, String> projectMap = new HashMap<>();
+        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex((project + module).getBytes()));
+        projectMap.put(FIELD_PROJECT, project);
+        projectMap.put(FIELD_MODULE, module);
+        request.source(projectMap);
+        try {
+            client.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
+    @Async
     public void insertUuid(String project, String module, String uuid) {
 
+        insertModule(project, module);
+        insertProject(project);
+
+        IndexRequest request = new IndexRequest(MODULE_INDEX_NAME);
+        Map<String, String> projectMap = new HashMap<>();
+        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex((project + module + uuid).getBytes()));
+        projectMap.put(FIELD_PROJECT, project);
+        projectMap.put(FIELD_MODULE, module);
+        projectMap.put(FIELD_UUID, uuid);
+        request.source(projectMap);
+        try {
+            client.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public List<String> getProjectNameList(String project) {
-        return null;
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_PROJECT, "*" + project + "*");
+        SearchRequest searchRequest = new SearchRequest(PROJECT_INDEX_NAME);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(wildcardQueryBuilder);
+        searchRequest.source(sourceBuilder);
+        final SearchResponse search;
+        List<String> projectList = new LinkedList<>();
+
+        try {
+            search = client.search(searchRequest, RequestOptions.DEFAULT);
+            final SearchHits hits = search.getHits();
+            for (SearchHit hit : hits.getHits()) {
+
+                final String sourceAsString = hit.getSourceAsString();
+                final Map<String, String> map = objectMapper.readValue(sourceAsString, Map.class);
+                projectList.add(map.get(FIELD_PROJECT));
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return projectList;
     }
 
     @Override
     public List<String> getModuleNameList(String project, String module) {
-        return null;
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_PROJECT, "*" + module + "*");
+        SearchRequest searchRequest = new SearchRequest(MODULE_INDEX_NAME);
+
+        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(FIELD_PROJECT, project).operator(Operator.AND);
+        matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+        boolQueryBuilder.must(matchQueryBuilder);
+        boolQueryBuilder.must(wildcardQueryBuilder);
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        sourceBuilder.query(boolQueryBuilder);
+        searchRequest.source(sourceBuilder);
+        final SearchResponse search;
+        List<String> moduleList = new LinkedList<>();
+
+        try {
+            search = client.search(searchRequest, RequestOptions.DEFAULT);
+            final SearchHits hits = search.getHits();
+            for (SearchHit hit : hits.getHits()) {
+
+                final String sourceAsString = hit.getSourceAsString();
+                final Map<String, String> map = objectMapper.readValue(sourceAsString, Map.class);
+                moduleList.add(map.get(FIELD_MODULE));
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return moduleList;
     }
 
     @Override
     public List<String> getUuidNameList(String project, String module, String uuid) {
-        return null;
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_PROJECT, "*" + module + "*");
+        SearchRequest searchRequest = new SearchRequest(MODULE_INDEX_NAME);
+
+        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(FIELD_PROJECT, project).operator(Operator.AND);
+        matchQueryBuilder.fuzziness(Fuzziness.AUTO);
+
+        MatchQueryBuilder matchQueryBuilder2 = new MatchQueryBuilder(FIELD_MODULE, module).operator(Operator.AND);
+        matchQueryBuilder2.fuzziness(Fuzziness.AUTO);
+
+        boolQueryBuilder.must(matchQueryBuilder);
+        boolQueryBuilder.must(wildcardQueryBuilder);
+        boolQueryBuilder.must(matchQueryBuilder2);
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        sourceBuilder.query(boolQueryBuilder);
+        searchRequest.source(sourceBuilder);
+        final SearchResponse search;
+        List<String> projectList = new LinkedList<>();
+
+        try {
+            search = client.search(searchRequest, RequestOptions.DEFAULT);
+            final SearchHits hits = search.getHits();
+            for (SearchHit hit : hits.getHits()) {
+
+                final String sourceAsString = hit.getSourceAsString();
+                final Map<String, String> map = objectMapper.readValue(sourceAsString, Map.class);
+                projectList.add(map.get(FIELD_UUID));
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return projectList;
     }
 }

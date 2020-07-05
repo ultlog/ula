@@ -29,6 +29,7 @@ public class LogController {
     public void collectLog(@RequestBody Log log) {
         log.setAcceptTime(System.currentTimeMillis());
         esService.insertLog(log);
+        esService.insertUuid(log.getProject(),log.getModule(),log.getUuid());
     }
 
 

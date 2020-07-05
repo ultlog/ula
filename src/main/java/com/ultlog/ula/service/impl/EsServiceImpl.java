@@ -1,7 +1,6 @@
 package com.ultlog.ula.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ultlog.common.constant.ESConstant;
 import com.ultlog.common.model.Log;
 import com.ultlog.common.model.Page;
 import com.ultlog.common.model.Query;
@@ -60,11 +59,11 @@ public class EsServiceImpl implements EsService {
         final String s;
         try {
             s = objectMapper.writeValueAsString(log);
-            IndexRequest request = new IndexRequest(ESConstant.INDEX_NAME);
+            IndexRequest request = new IndexRequest(LOG_INDEX_NAME);
             request.source(s, XContentType.JSON);
             client.index(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -154,7 +153,7 @@ public class EsServiceImpl implements EsService {
             final CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
             count = Long.valueOf(countResponse.getCount()).intValue();
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
 
@@ -163,7 +162,7 @@ public class EsServiceImpl implements EsService {
 
         // sort
         sourceBuilder.sort(new FieldSortBuilder(FIELD_CREATE_TIME).order(SortOrder.DESC));
-        SearchRequest searchRequest = new SearchRequest();
+        SearchRequest searchRequest = new SearchRequest(LOG_INDEX_NAME);
         searchRequest.source(sourceBuilder);
         final SearchResponse search;
         List<Log> logs = new LinkedList<>();
@@ -177,10 +176,40 @@ public class EsServiceImpl implements EsService {
                 logs.add(log);
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
 
         return new Page<>(count, size, offset, logs);
+    }
+
+    @Override
+    public void insertProject(String project) {
+
+    }
+
+    @Override
+    public void insertModule(String project, String module) {
+
+    }
+
+    @Override
+    public void insertUuid(String project, String module, String uuid) {
+
+    }
+
+    @Override
+    public List<String> getProjectNameList(String project) {
+        return null;
+    }
+
+    @Override
+    public List<String> getModuleNameList(String project, String module) {
+        return null;
+    }
+
+    @Override
+    public List<String> getUuidNameList(String project, String module, String uuid) {
+        return null;
     }
 }

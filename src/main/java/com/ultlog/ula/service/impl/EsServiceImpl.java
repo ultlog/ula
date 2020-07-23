@@ -187,8 +187,8 @@ public class EsServiceImpl implements EsService {
     public void insertProject(String project) {
         IndexRequest request = new IndexRequest(PROJECT_INDEX_NAME);
         Map<String, String> projectMap = new HashMap<>();
-        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex(project.getBytes()));
         projectMap.put(FIELD_PROJECT, project);
+        request.id(DigestUtils.md5DigestAsHex(project.getBytes()));
         request.source(projectMap);
         try {
             client.index(request, RequestOptions.DEFAULT);
@@ -201,9 +201,9 @@ public class EsServiceImpl implements EsService {
     public void insertModule(String project, String module) {
         IndexRequest request = new IndexRequest(MODULE_INDEX_NAME);
         Map<String, String> projectMap = new HashMap<>();
-        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex((project + module).getBytes()));
         projectMap.put(FIELD_PROJECT, project);
         projectMap.put(FIELD_MODULE, module);
+        request.id(DigestUtils.md5DigestAsHex((project + module).getBytes()));
         request.source(projectMap);
         try {
             client.index(request, RequestOptions.DEFAULT);
@@ -219,12 +219,12 @@ public class EsServiceImpl implements EsService {
         insertModule(project, module);
         insertProject(project);
 
-        IndexRequest request = new IndexRequest(MODULE_INDEX_NAME);
+        IndexRequest request = new IndexRequest(UUID_INDEX_NAME);
         Map<String, String> projectMap = new HashMap<>();
-        projectMap.put(FIELD_ID, DigestUtils.md5DigestAsHex((project + module + uuid).getBytes()));
         projectMap.put(FIELD_PROJECT, project);
         projectMap.put(FIELD_MODULE, module);
         projectMap.put(FIELD_UUID, uuid);
+        request.id(DigestUtils.md5DigestAsHex((project + module + uuid).getBytes()));
         request.source(projectMap);
         try {
             client.index(request, RequestOptions.DEFAULT);
@@ -262,7 +262,7 @@ public class EsServiceImpl implements EsService {
     public List<String> getModuleNameList(String project, String module) {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 
-        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_PROJECT, "*" + module + "*");
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_MODULE, "*" + module + "*");
         SearchRequest searchRequest = new SearchRequest(MODULE_INDEX_NAME);
 
         MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(FIELD_PROJECT, project).operator(Operator.AND);
@@ -296,8 +296,8 @@ public class EsServiceImpl implements EsService {
     public List<String> getUuidNameList(String project, String module, String uuid) {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 
-        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_PROJECT, "*" + module + "*");
-        SearchRequest searchRequest = new SearchRequest(MODULE_INDEX_NAME);
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(FIELD_UUID, "*" + uuid + "*");
+        SearchRequest searchRequest = new SearchRequest(UUID_INDEX_NAME);
 
         MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(FIELD_PROJECT, project).operator(Operator.AND);
         matchQueryBuilder.fuzziness(Fuzziness.AUTO);

@@ -1,8 +1,12 @@
 package com.ultlog.ula.controller;
 
+import com.ultlog.common.model.Result;
 import com.ultlog.ula.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -13,7 +17,7 @@ import java.util.List;
  * @author: will
  * @create: 2020-06-28
  **/
-@RequestMapping("/api/v1/project")
+@RequestMapping("/api/v1/")
 @RestController
 public class ProjectController {
 
@@ -21,22 +25,25 @@ public class ProjectController {
     private EsService esService;
 
 
-    @RequestMapping("")
-    public List<String> getProjectNameList(String project){
+    @RequestMapping("/project")
+    public Result<List<String>> getProjectNameList(@RequestParam(value = "project",required = false,defaultValue = "") String project){
 
-        return esService.getProjectNameList(project);
+        return new Result<>(HttpStatus.OK.value(),null,esService.getProjectNameList(project));
     }
 
-    @RequestMapping("/module")
-    public List<String> getModuleNameList(String project,String module){
+    @GetMapping("/module")
+    public Result<List<String>> getModuleNameList(@RequestParam(value = "project") String project,
+                                          @RequestParam(value = "module",required = false,defaultValue = "")String module){
 
-        return esService.getModuleNameList(project,module);
+        return new Result<>(HttpStatus.OK.value(),null,esService.getModuleNameList(project, module));
     }
 
     @RequestMapping("/uuid")
-    public List<String> getUuidNameList(String project,String module,String uuid){
+    public Result<List<String>> getUuidNameList(@RequestParam(value = "project") String project,
+                                        @RequestParam(value = "module") String module,
+                                        @RequestParam(value = "uuid",required = false,defaultValue = "") String uuid){
 
-        return esService.getUuidNameList(project,module,uuid);
+        return new Result<>(HttpStatus.OK.value(),null,esService.getUuidNameList(project,module,uuid));
     }
 
 }

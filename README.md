@@ -1,8 +1,9 @@
 # ula
 
-### 前置
+## 前置
 需要7.x版本的[Elasticsearch](https://www.elastic.co/)
 
+## 安装
 ### 下载
 点击[此处](https://github.com/ultlog/ula/releases)下载ula-0.0.1.jar
 

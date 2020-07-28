@@ -88,20 +88,12 @@ public class EsServiceImpl implements EsService {
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
-        // default select 0 ~ now
-        if (ObjectUtil.AllObjectNull(project, module, uuid, level, message, stack, gt, lt)) {
-
-            final RangeQueryBuilder createTime = new RangeQueryBuilder(FIELD_CREATE_TIME);
-            createTime.gt(0);
-            createTime.lt(System.currentTimeMillis());
-            sourceBuilder.query(createTime);
-
-        } else if (ObjectUtil.AllObjectNull(project, uuid, level, module, message, stack) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
+        if (ObjectUtil.allObjectNullOrEmpty(project, uuid, level, module, message, stack) && Objects.nonNull(gt) && Objects.nonNull(lt)) {
             final RangeQueryBuilder createTime = new RangeQueryBuilder(FIELD_CREATE_TIME);
             createTime.lt(lt);
             createTime.gt(gt);
             sourceBuilder.query(createTime);
-        } else {
+        } else if(ObjectUtil.anyObjectNullOrEmpty(project, uuid, level, module, message, stack)) {
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             if (!StringUtils.isEmpty(project)) {
                 MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(FIELD_PROJECT, project).operator(Operator.AND);
@@ -135,7 +127,7 @@ public class EsServiceImpl implements EsService {
                 matchQueryBuilder.fuzziness(Fuzziness.AUTO);
                 boolQueryBuilder.must(matchQueryBuilder);
             }
-            if (lt != null && gt != null) {
+            if (Objects.nonNull(gt) && Objects.nonNull(lt)) {
                 final RangeQueryBuilder createTime = new RangeQueryBuilder(FIELD_CREATE_TIME);
                 createTime.lt(lt);
                 createTime.gt(gt);

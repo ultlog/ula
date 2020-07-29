@@ -11,19 +11,29 @@ import org.springframework.util.StringUtils;
 public class ObjectUtil {
 
     /**
-     * all object null
+     * all object null or empty
      *
      * @param objects object array
      * @return bool
      */
-    public static boolean AllObjectNull(Object... objects) {
+    public static boolean allObjectNullOrEmpty(Object... objects) {
 
         for (Object object : objects) {
-            // todo change #isEmpty to @isBotBlank
             if (object != null && (!(object instanceof String) || !StringUtils.isEmpty(object))) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * anyone object is not null and empty
+     *
+     * @param objects object array
+     * @return bool
+     */
+    public static boolean anyObjectNullOrEmpty(Object... objects) {
+
+        return !allObjectNullOrEmpty(objects);
     }
 }

@@ -39,7 +39,7 @@ click[this](https://github.com/ultlog/ula/releases) to download ula.jar.
 java -jar -D"ultlog.es.address.host={es-ip}" -D"ultlog.es.address.port={es-port}"   ula-0.0.1.jar
  ````
 Replace es-ip and es-port.
-### 个性化
+### Config
 
 If you need to modify the configuration information such as port, ip.You can add it in the startup item.
 ````shell script

@@ -29,6 +29,84 @@ The abbreviation of ultlog-api is ula, which is a http server to save logs to es
 
 ## Need
 Requires [Elasticsearch](https://www.elastic.co/) which version is 7.x .
+### Create Index
+````shell
+curl -XPUT  -H 'Content-Type: application/json' localhost:9200/ult_index -d@data.json
+
+````
+<details>
+<summary>json.data</summary>
+<pre><code>
+
+````json
+{
+    "mappings" : {
+      "properties" : {
+        "acceptTime" : {
+          "type" : "long"
+        },
+        "createTime" : {
+          "type" : "long"
+        },
+        "level" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "message" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "text"
+            }
+          }
+        },
+        "module" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "project" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "stack" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "text"
+            }
+          }
+        },
+        "uuid" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
+    },
+    "settings":{}
+}
+````
+</code></pre>
+</details>
 
 ## Install
 ### Download
